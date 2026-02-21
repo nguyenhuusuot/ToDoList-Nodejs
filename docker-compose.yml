@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # Dịch vụ Database (MongoDB)
+  mongodb:
+    image: mongo:latest
+    container_name: my_mongo_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db # Lưu trữ dữ liệu vĩnh viễn, tắt container không bị mất
+
+  # Dịch vụ Backend Node.js
+  api:
+    build: . # Build từ file Dockerfile ở thư mục hiện tại
+    container_name: my_nodejs_api
+    ports:
+      - "2024:2024" # Map cổng 2024 của máy bạn vào cổng 2024 của container
+    depends_on:
+      - mongodb # Chờ Database chạy lên trước rồi App mới chạy
+    environment:
+      - PORT=2024
+      - MONGODB_URI=mongodb://mongodb:27017
+      - DB_NAME=my_todo_project
+      - ACCESS_TOKEN_SECRET=khoa_ngan_han_bao_mat
+      - ACCESS_TOKEN_LIFE=15m
+      - REFRESH_TOKEN_SECRET=khoa_dai_han_cuc_ky_bao_mat_@123
+      - REFRESH_TOKEN_LIFE=7d
+
+# Định nghĩa volume để lưu data Mongo
+volumes:
+  mongo_data:
